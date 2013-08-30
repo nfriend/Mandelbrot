@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+		<title>CMSC 305 Project 1: Fractals</title>
+		
+		<link rel='stylesheet' href='bootstrap/css/bootstrap.min.css' />
+		<link rel="icon" href="favicon.ico" type="image/x-icon" />
+		
+		<style>
+			#fractal-header {
+				position: absolute;
+				width: 100%;
+				height: 10%;
+				display: none;				
+			}
+			
+			#canvas-container {
+				position: absolute;
+				top: 15%;
+				height: 85%;		
+				width: 100%;		
+				display: none;	
+				text-align: center;
+			}
+			
+			#fractal-display {
+				border: solid black 3px;
+				border-radius: 4px;
+			}
+			
+			#again, #download {
+				margin-top: -100%;
+				
+				-webkit-transition: margin-top 0.3s ease;
+				-moz-transition: margin-top 0.3s ease;
+				-o-transition: margin-top 0.3s ease;
+				transition: margin-top 0.3s ease;
+			}	
+			
+			#again.in, #download.in{
+				margin-top: 0%;
+			}	
+			#accuracy-control-group .help-inline {
+				display: none;
+			}
+			</style>
+		
+		<script src='browserdetect.js'></script>
+		<script src='jquery/jquery-1.9.1.min.js'></script>
+		<script src='bootstrap/js/bootstrap.min.js'></script>		
+		<script src='stopwatch.js'></script>
+		<script src='main.js'></script>		
+		
+	</head>
+
+	<body>
+		<div id='fractal-header'>
+			<div id='header-text' style='float: left; margin-left: 20px;'><h1>Thinking...</h1></div>
+			<div style='float: right; margin: 10px; margin-right: 20px;'>
+				<a id='download' class='btn btn-primary btn-large' disabled target="_blank">Download as image</a>	
+				<button id='again' class='btn btn-success btn-large' disabled>Start over!</button>							
+			</div>
+		</div>
+		<div id='canvas-container'></div>
+		
+		<!-- Option modal -->
+		<div id='options-modal' class="modal hide fade" data-backdrop='static'>
+		  	<div class="modal-header">
+		    	<h3>Welcome!</h3>
+		  	</div>
+		  	<div class="modal-body">
+		    	<p>Please choose how you'd like your fractal generated:</p>
+		    	<br />
+		    	<form class="form-horizontal">
+				  	<div class="control-group">
+				    	<label class="control-label">Number of threads:</label>
+				    	<div class="controls">
+				      		<select id='thread-count'>
+				      			<option>1</option>
+				      			<option>2</option>
+				      			<option>4</option>
+				      			<option>8</option>
+				      			<option id='16threads'>16</option>
+				      			<option selected id='32threads'>32</option>
+				      			<!-- <option>1 per line</option> -->
+				      		</select>
+				    	</div>
+				  	</div>
+				  	<div class="control-group" id='accuracy-control-group'>
+				    	<label class="control-label">Accuracy:</label>
+				    	<div class="controls">
+				      		<input type='text' id='accuracy' value='10000'/><br />				      		
+				    	</div>
+				  	</div>
+				  	<div class="control-group">
+				    	<label class="control-label">Color:</label>
+				    	<div class="controls">
+				      		<select id='color'>
+				      			<option>Red</option>
+				      			<option>Green</option>
+				      			<option selected>Blue</option>
+				      			<option>Yellow</option>
+				      			<option>Purple</option>
+				      			<option>Black</option>
+				      		</select>
+				    	</div>
+				  	</div>			  	
+				  	<div class="control-group">
+					    <div class="controls">
+					      	<label class="checkbox">
+					        	<input id='inverse' type="checkbox"> Invert colors
+					      	</label>
+					   	</div>
+					</div>
+					<div class="control-group">
+					    <div class="controls">
+					      	<label class="checkbox">
+					        	<input id='fittopage' type="checkbox" checked> Fit image to page
+					      	</label>
+					   	</div>
+					</div>	
+					<div id='custom-dimensions-container' style='display: none; margin: none; padding: none;'>
+						<div class="control-group" id='width-control-group'>
+					    	<label class="control-label">Width:</label>
+					    	<div class="controls">
+					      		<input type='text' id='custom-width' value='1920'/><br />				      		
+					    	</div>
+					  	</div>	
+					  	<div class="control-group" id='height-control-group'>
+					    	<label class="control-label">Height:</label>
+					    	<div class="controls">
+					      		<input type='text' id='custom-height' value='1097'/><br />				      		
+					    	</div>
+					  	</div>
+					</div>	  					  	
+				</form>
+		  	</div>
+		  	<div class="modal-footer">
+		    	<a href="#" id= 'generate-button' class="btn btn-success">Generate!</a>
+		  	</div>
+		</div>
+		
+		<!-- No Workers modal -->
+		<div id='no-workers-modal' class="modal hide fade" data-backdrop='static'>
+		  	<div class="modal-header">
+		    	<h3>Sorry...</h3>
+		  	</div>
+		  	<div class="modal-body">
+		    	<p>It looks like your browser doesn't support Workers; you'll need to upgrade if you'd like to view this page.  My personal favorite is Google Chrome.</p>		    	
+		  	</div>
+		  	<div class="modal-footer">
+		    	<a href="http://www.google.com/chrome" class="btn btn-success">Give me Chrome!</a>
+		    </div>		  	
+		</div>
+		
+		<!-- Secret accuracy changing modal, trigger by pushing "a" -->
+		<div id='secret-modal' class="modal hide fade" data-backdrop='static'>
+		  	<div class="modal-header">
+		    	<h3>Super secret option!</h3>
+		  	</div>
+		  	<div class="modal-body">
+		    	<p>Congrats, you've found the super-secret accuracy changing modal!</p>
+		    	<br />		    	
+		    	<form class="form-horizontal">
+				  	<div class="control-group">
+				    	<label class="control-label">New accuracy:</label>
+				    	<div class="controls">
+				      		<input type='text' id='secret-accuracy' value='1000000'/><br />				      		
+				    	</div>
+				  	</div>				  		  					  	
+				</form>   	
+		  	</div>
+		  	<div class="modal-footer">
+		    	<button class="btn btn-success" data-dismiss="modal">Cool, I'm done.</button>
+		    </div>		  	
+		</div>
+	</body>
+</html>
