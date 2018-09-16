@@ -1,0 +1,10 @@
+{
+  "name": "@nathanfriend/mandelbrot",
+  "version": "1.0.0",
+  "description": "All the build artifacts necessary to run Mandelbrot",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nfriend/Mandelbrot/issues"
+  },
+  "homepage": "https://github.com/nfriend/Mandelbrot#readme"
+}
